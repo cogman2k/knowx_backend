@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Auth\Events\Registered;
 
 class UserController extends Controller
 {
@@ -33,8 +34,8 @@ class UserController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password)
-        ]);
-
+        ]); 
+        event(new Registered($user));
         return response()->json(["status" => "success", "error" => false, "message" => "Success! User registered."], 201);
     }
 
