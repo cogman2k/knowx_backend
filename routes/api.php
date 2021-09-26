@@ -20,8 +20,9 @@ Route::prefix('user')->group(function () {
     Route::post('register', [UserController::class, 'register']);
     Route::post('login', [UserController::class, 'login']);
     Route::get('email/verify/success', [UserController::class, 'verified']);
-    // Route::post('reset-password', [UserController::class, 'sendMail']);
-    // Route::put('reset-password/{token}', [UserController::class, 'reset']);
+
+    Route::post('forgot-password', [UserController::class, 'forgotPassword']);
+    Route::post('change-password', [UserController::class, 'passwordReset']);
 
     // passport auth api
     Route::middleware(['auth:api'])->group(function () {
@@ -34,7 +35,8 @@ Route::prefix('user')->group(function () {
 
 });
 
-<<<<<<< HEAD
+
+
 
 // Verify email
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
@@ -45,15 +47,4 @@ Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke
 Route::post('/email/verify/resend', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Verification link sent!');
-=======
-// Verify email
-Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
-->middleware(['signed', 'throttle:6,1'])
-->name('verification.verify');
-
-// Resend link to verify email
-Route::post('/email/verify/resend', function (Request $request) {
-$request->user()->sendEmailVerificationNotification();
-return back()->with('message', 'Verification link sent!');
->>>>>>> refs/remotes/origin/master
 })->middleware(['auth:api', 'throttle:6,1'])->name('verification.send');

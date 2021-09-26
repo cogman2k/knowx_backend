@@ -10,13 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Auth\Events\Registered;
-<<<<<<< HEAD
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\PasswordReset;
 use App\Notifications\ResetPasswordRequest;
-=======
->>>>>>> refs/remotes/origin/master
+use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
 {
@@ -118,39 +116,37 @@ class UserController extends Controller
         return view('verified');
     }
 
-    public function sendMail(Request $request)
-    {
-        $user = User::where('email', $request->email)->firstOrFail();
-        $passwordReset = PasswordReset::updateOrCreate([
-            'email' => $user->email,
-        ], [
-            'token' => Str::random(5),
+    public function forgotPassword(Request $request){
+        $input = $request->only('email');
+        $validator = Validator::make($input, [
+            'email' => "required|email"
         ]);
-        if ($passwordReset) {
-            $user->notify(new ResetPasswordRequest($passwordReset->token));
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
-  
-        return response()->json([
-            'message' => 'We have e-mailed your password reset link!'
-        ]);
+        $response = Password::sendResetLink($input);
+    
+        $message = $response == Password::RESET_LINK_SENT ? 'Mail send successfully' : GLOBAL_SOMETHING_WANTS_TO_WRONG;
+        
+        return response()->json($message);
     }
 
-    public function reset(Request $request, $token)
-    {
-        $passwordReset = PasswordReset::where('token', $token)->firstOrFail();
-        if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
-            $passwordReset->delete();
-
-            return response()->json([
-                'message' => 'This password reset token is invalid.',
-            ], 422);
-        }
-        $user = User::where('email', $passwordReset->email)->firstOrFail();
-        $updatePasswordUser = $user->update($request->only('password'));
-        $passwordReset->delete();
-
-        return response()->json([
-            'success' => $updatePasswordUser,
+    public function passwordReset(Request $request){
+        $input = $request->only('email','token', 'password', 'password_confirmation');
+        $validator = Validator::make($input, [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
         ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+        $response = Password::reset($input, function ($user, $password) {
+            $user->password = Hash::make($password);
+            $user->save();
+        });
+        $message = $response == Password::PASSWORD_RESET ? 'Password reset successfully' : GLOBAL_SOMETHING_WANTS_TO_WRONG;
+        return response()->json($message);
     }
+    
 }
