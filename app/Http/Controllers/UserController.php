@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Auth\Events\Registered;
+<<<<<<< HEAD
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\PasswordReset;
 use App\Notifications\ResetPasswordRequest;
+=======
+>>>>>>> refs/remotes/origin/master
 
 class UserController extends Controller
 {

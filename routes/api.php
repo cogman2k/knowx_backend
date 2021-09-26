@@ -34,6 +34,7 @@ Route::prefix('user')->group(function () {
 
 });
 
+<<<<<<< HEAD
 
 // Verify email
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
@@ -44,4 +45,15 @@ Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke
 Route::post('/email/verify/resend', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Verification link sent!');
+=======
+// Verify email
+Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+->middleware(['signed', 'throttle:6,1'])
+->name('verification.verify');
+
+// Resend link to verify email
+Route::post('/email/verify/resend', function (Request $request) {
+$request->user()->sendEmailVerificationNotification();
+return back()->with('message', 'Verification link sent!');
+>>>>>>> refs/remotes/origin/master
 })->middleware(['auth:api', 'throttle:6,1'])->name('verification.send');
