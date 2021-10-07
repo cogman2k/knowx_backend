@@ -11,10 +11,11 @@ class Post extends Model
 
     protected $fillable = [
         'title',
-        'description',
+        'hastag',
+        'content',
         'user_id',
-        'completed',
-        'active'
+        // 'completed',
+        // 'active'
     ];
 
     public function user() {

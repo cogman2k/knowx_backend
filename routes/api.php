@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\VerifyEmailController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\QuestionController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,7 +24,7 @@ Route::prefix('user')->group(function () {
     Route::get('email/verify/success', [UserController::class, 'verified']);
 
     Route::post('forgot-password', [UserController::class, 'forgotPassword']);
-    Route::post('change-password', [UserController::class, 'passwordReset']);
+    Route::post('reset-password', [UserController::class, 'reset']);
 
     // passport auth api
     Route::middleware(['auth:api'])->group(function () {
@@ -31,6 +33,7 @@ Route::prefix('user')->group(function () {
 
         // Posts resource route
         Route::resource('posts', PostController::class);
+        Route::resource('questions', QuestionController::class);
     });
 
 });

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Post;
+use App\Models\Question;
 use Exception;
 use Facade\FlareClient\Http\Exceptions\NotFound;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class PostController extends Controller
+class QuestionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,8 +18,13 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Auth::user()->posts;
-        return response()->json(["status" => "success", "error" => false, "count" => count($posts), "data" => $posts],200);
+        $questions = Auth::user()->questions;
+        return response()->json([
+            "status" => "success",
+            "error" =>  false,
+            "count" => count($questions),
+            "data" => $questions,
+        ], 200);
     }
 
     /**
@@ -41,23 +46,23 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "title" => "required|min:3|unique:posts,title",
-            "hastag" => "required",
-            "content" => "required"
+            'title' => 'required|min:3|unique:questions,title',
+            'hastag' => 'required',
+            'content' => 'required'
         ]);
 
         if($validator->fails()) {
             return $this->validationErrors($validator->errors());
         }
 
-        try {
-            $post = Post::create([
-                "title" => $request->title,
-                "hastag" => $request->hastag,
-                "content" => $request->content,
-                "user_id" => Auth::user()->id
+        try{
+            $question = Question::create([
+                'title' => $request->title,
+                'hastag' => $request->hastag,
+                'content' => $request->content,
+                'user_id' => Auth::user()->id
             ]);
-            return response()->json(["status" => "success", "error" => false, "message" => "Success! post created."], 201);
+            return response()->json(["status" => "success", "error" => false, "message" => "Question created successfully!"], 201);
         }
         catch(Exception $exception) {
             return response()->json(["status" => "failed", "error" => $exception->getMessage()], 404);
@@ -72,12 +77,15 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Auth::user()->posts->find($id);
-
-        if($post) {
-            return response()->json(["status" => "success", "error" => false, "data" => $post], 200);
+        $question = Auth::user()->questions->find($id);
+        if($question){
+            return response()->json([
+                'status' => 'success',
+                'error' => false,
+                'data' => $post
+            ], 200);
         }
-        return response()->json(["status" => "failed", "error" => true, "message" => "Failed! no post found."], 404);
+        return response()->json(["status" => "failed", "error" => true, "message" => "Failed! no question found."], 404);
     }
 
     /**
@@ -100,9 +108,9 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $post = Auth::user()->posts->find($id);
+        $question = Auth::user()->questions->find($id);
 
-        if($post) {
+        if($question) {
             $validator = Validator::make($request->all(), [
                 'title' => 'required',
                 'hastag' => 'required',
@@ -113,24 +121,14 @@ class PostController extends Controller
                 return $this->validationErrors($validator->errors());
             }
 
-            $post['title'] = $request->title;
-            $post['hastag'] = $request->hastag;
-            $post['content'] = $request->content;
-
-            // // if has active
-            // if($request->active) {
-            //     $post['active'] = $request->active;
-            // }
-
-            // // if has completed
-            // if($request->completed) {
-            //     $post['completed'] = $request->completed;
-            // }
-
-            $post->save();
-            return response()->json(["status" => "success", "error" => false, "message" => "Success! post updated."], 201);
+            $question['title'] = $request->title;
+            $question['hastag'] = $request->hastag;
+            $question['content'] = $request->content;
+            $question->save();
+            
+            return response()->json(["status" => "success", "error" => false, "message" => "Success! question updated."], 201);
         }
-        return response()->json(["status" => "failed", "error" => true, "message" => "Failed no post found."], 404);
+        return response()->json(["status" => "failed", "error" => true, "message" => "Failed no question found."], 404);
     }
 
     /**
@@ -141,11 +139,11 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post = Auth::user()->posts->find($id);
-        if($post) {
-            $post->delete();
-            return response()->json(["status" => "success", "error" => false, "message" => "Success! post deleted."], 200);
+        $question = Auth::user()->questions->find($id);
+        if($question) {
+            $question->delete();
+            return response()->json(["status" => "success", "error" => false, "message" => "Success! question deleted."], 200);
         }
-        return response()->json(["status" => "failed", "error" => true, "message" => "Failed no post found."], 404);
+        return response()->json(["status" => "failed", "error" => true, "message" => "Failed no question found."], 404);
     }
 }
