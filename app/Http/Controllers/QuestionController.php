@@ -82,7 +82,7 @@ class QuestionController extends Controller
             return response()->json([
                 'status' => 'success',
                 'error' => false,
-                'data' => $post
+                'data' => $_POST
             ], 200);
         }
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed! no question found."], 404);

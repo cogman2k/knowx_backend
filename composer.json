@@ -12,7 +12,9 @@
         "laravel/passport": "^10.1",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "nesbot/carbon": "^2.53"
+        "nesbot/carbon": "^2.53",
+        "overtrue/laravel-follow": "^3.0",
+        "pusher/pusher-php-server": "^7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

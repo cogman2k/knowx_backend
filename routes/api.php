@@ -3,10 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\TodoController;
 use App\Http\Controllers\VerifyEmailController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileControler;
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\ForgotController;
+use App\Http\Controllers\MessageController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,24 +20,33 @@ use App\Http\Controllers\QuestionController;
 |
 */
 
-Route::prefix('user')->group(function () { 
+Route::prefix('user')->group(function () {
     Route::post('register', [UserController::class, 'register']);
     Route::post('login', [UserController::class, 'login']);
     Route::get('email/verify/success', [UserController::class, 'verified']);
+    //Route::post('forgot-password', [ForgotController::class, 'forgotPassword']);
+    Route::get('like', [PostController::class, 'like']);
+    Route::post('like', [PostController::class, 'postLike']);
 
-    Route::post('forgot-password', [UserController::class, 'forgotPassword']);
-    Route::post('reset-password', [UserController::class, 'reset']);
+
 
     // passport auth api
     Route::middleware(['auth:api'])->group(function () {
         Route::get('/', [UserController::class, 'user']);
         Route::get('logout', [UserController::class, 'logout']);
-
+        Route::post('change-password', [ProfileControler::class, 'changePassword']);
+        Route::post('forgot-password', [UserController::class, 'forgotpassword']);
+        Route::post('reset-password', [ForgotController::class, 'reset']);
+        Route::post('bookmark', [PostController::class, 'postBookmark']);
+        
+        Route::get('getbookmark', [PostController::class, 'getBookmark']);
+        Route::get('mes', [MessageController::class, 'index']);
+        Route::get('messages', [MessageController::class, 'fetchMessages']);
+        Route::post('messages', [MessageController::class, 'sendMessage']);
         // Posts resource route
         Route::resource('posts', PostController::class);
         Route::resource('questions', QuestionController::class);
     });
-
 });
 
 
