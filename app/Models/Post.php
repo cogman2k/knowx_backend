@@ -4,20 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Overtrue\LaravelFollow\Traits\CanBeLiked;
-use Overtrue\LaravelFollow\Traits\CanBeBookmarked;
+
 class Post extends Model
 {
     use HasFactory;
-    
-
     protected $fillable = [
         'title',
         'hastag',
         'content',
+        'like',
         'user_id',
-        // 'completed',
-        // 'active'
+        
     ];
 
     public function user() {
@@ -31,8 +28,4 @@ class Post extends Model
     {
     return $this->belongsToMany(Bookmark::class);
     }
-   
-   public function is_bookmarked(User $user){
-       return $this->bookmarks->contains($user);
-   }
 }

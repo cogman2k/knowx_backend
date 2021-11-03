@@ -190,6 +190,7 @@ class PostController extends Controller
  
     public function postLike(Request $request)
     {
+        $user = Auth::user();  
         
         $validator = Validator::make($request->all(), [
             "post_id" => "required",
@@ -197,20 +198,34 @@ class PostController extends Controller
         if ($validator->fails()) {
             return $this->validationErrors($validator->errors());
         };
-        $like = DB::table('likes')->where('post_id', '=', $request->post_id)->get();
+        $like = DB::table('likes')->where('user_id', '=', $user->id)->where('post_id', '=', $request->post_id)->get();
         
         if (count($like)>0) {
-            DB::table('likes')->where('post_id', '=', $request->post_id)->delete();
+            DB::table('likes')->where('user_id', '=', $user->id)->where('post_id', '=', $request->post_id)->delete();
+            if($like){
+            DB::table('posts')->decrement('like');
+            }
+            
             return response()->json(["status" => "success", "type" => "dislike", "error" => false, "message" => "Successfully dislike."], 201);
         }
         Like::create([
-           
+            'user_id'=>$user->id,
             'post_id' => $request->post_id,
         ]);
+        DB::table('posts')->increment('like');
         return response()->json(["status" => "success", "type" => "like", "error" => false, "message" => "Successfully like."], 404);
 
     }
-    
+    public function getLike(){
+        try {
+            $user=Auth::user();
+            $like = Like::where('user_id','=',$user->id)->get();
+            
+            return response()->json(["status" => "success", "error" => false, "data" => $like], 200);
+        } catch (NotFoundHttpException $exception) {
+            return response()->json(["status" => "failed", "error" => $exception], 401);
+        }
+    }
         
  
     

@@ -25,8 +25,7 @@ Route::prefix('user')->group(function () {
     Route::post('login', [UserController::class, 'login']);
     Route::get('email/verify/success', [UserController::class, 'verified']);
     //Route::post('forgot-password', [ForgotController::class, 'forgotPassword']);
-    Route::get('like', [PostController::class, 'like']);
-    Route::post('like', [PostController::class, 'postLike']);
+    
 
 
 
@@ -40,6 +39,8 @@ Route::prefix('user')->group(function () {
         Route::post('bookmark', [PostController::class, 'postBookmark']);
         
         Route::get('getbookmark', [PostController::class, 'getBookmark']);
+        Route::get('like', [PostController::class, 'getLike']);
+    Route::post('like', [PostController::class, 'postLike']);
         Route::get('mes', [MessageController::class, 'index']);
         Route::get('messages', [MessageController::class, 'fetchMessages']);
         Route::post('messages', [MessageController::class, 'sendMessage']);
