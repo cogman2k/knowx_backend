@@ -39,8 +39,10 @@ Route::prefix('user')->group(function () {
         Route::post('bookmark', [PostController::class, 'postBookmark']);
         
         Route::get('getbookmark', [PostController::class, 'getBookmark']);
-        Route::get('like', [PostController::class, 'getLike']);
-    Route::post('like', [PostController::class, 'postLike']);
+        Route::get('likepost', [PostController::class, 'getLike']);
+        Route::post('likepost', [PostController::class, 'postLike']);
+        Route::get('likequestion', [QuestionController::class, 'getLike']);
+        Route::post('likequestion', [QuestionController::class, 'questionLike']);
         Route::get('mes', [MessageController::class, 'index']);
         Route::get('messages', [MessageController::class, 'fetchMessages']);
         Route::post('messages', [MessageController::class, 'sendMessage']);

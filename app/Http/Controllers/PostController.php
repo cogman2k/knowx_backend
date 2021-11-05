@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bookmark;
 use App\Models\Like;
+use App\Models\LikePost;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
@@ -198,28 +199,28 @@ class PostController extends Controller
         if ($validator->fails()) {
             return $this->validationErrors($validator->errors());
         };
-        $like = DB::table('likes')->where('user_id', '=', $user->id)->where('post_id', '=', $request->post_id)->get();
+        $like = DB::table('like_posts')->where('user_id', '=', $user->id)->where('post_id', '=', $request->post_id)->get();
         
         if (count($like)>0) {
-            DB::table('likes')->where('user_id', '=', $user->id)->where('post_id', '=', $request->post_id)->delete();
+            DB::table('like_posts')->where('user_id', '=', $user->id)->where('post_id', '=', $request->post_id)->delete();
             if($like){
             DB::table('posts')->decrement('like');
             }
             
-            return response()->json(["status" => "success", "type" => "dislike", "error" => false, "message" => "Successfully dislike."], 201);
+            return response()->json(["status" => "success", "type" => "dislike", "error" => false, "message" => "Successfully dislike post."], 201);
         }
-        Like::create([
+        LikePost::create([
             'user_id'=>$user->id,
             'post_id' => $request->post_id,
         ]);
         DB::table('posts')->increment('like');
-        return response()->json(["status" => "success", "type" => "like", "error" => false, "message" => "Successfully like."], 404);
+        return response()->json(["status" => "success", "type" => "like", "error" => false, "message" => "Successfully like post."], 404);
 
     }
     public function getLike(){
         try {
             $user=Auth::user();
-            $like = Like::where('user_id','=',$user->id)->get();
+            $like = LikePost::where('user_id','=',$user->id)->get();
             
             return response()->json(["status" => "success", "error" => false, "data" => $like], 200);
         } catch (NotFoundHttpException $exception) {
