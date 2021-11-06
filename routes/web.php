@@ -14,5 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('verified');
 });
+Route::get('chat', function () {
+    return view('chat');
+});
+

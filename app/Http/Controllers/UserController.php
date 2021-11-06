@@ -20,7 +20,8 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class UserController extends Controller
 {
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             "first_name" => "required",
@@ -30,18 +31,18 @@ class UserController extends Controller
             "phone" => "required|min:10"
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             return $this->validationErrors($validator->errors());
         }
 
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'full_name' => $request->first_name . " ".$request->last_name,
+            'full_name' => $request->first_name . " " . $request->last_name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password)
-        ]); 
+        ]);
         event(new Registered($user));
         return response()->json(["status" => "success", "error" => false, "message" => "Success! User registered."], 201);
     }
@@ -52,19 +53,20 @@ class UserController extends Controller
      * @param Request $request
      * @return void
      */
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             "email" => "required|email",
             "password" => "required|min:3"
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             return $this->validationErrors($validator->errors());
         }
 
         try {
-            if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $user = Auth::user();
                 $token = $user->createToken('token')->accessToken;
                 return response()->json(
@@ -77,8 +79,7 @@ class UserController extends Controller
                 );
             }
             return response()->json(["status" => "failed", "message" => "Failed! invalid credentials."], 404);
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             return response()->json(["status" => "failed", "message" => $e->getMessage()], 404);
         }
     }
@@ -88,68 +89,39 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function user() {
+    public function user()
+    {
         try {
             $user = Auth::user();
             return response()->json(["status" => "success", "error" => false, "data" => $user], 200);
-        }
-        catch(NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException $exception) {
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }
     }
 
     /**
-    * Logout Auth User
-    *
-    * @param Request $request
-    * @return void
-    */
-    public function logout() {
+     * Logout Auth User
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function logout()
+    {
 
-        if(Auth::check()) {
+        if (Auth::check()) {
             Auth::user()->token()->revoke();
             return response()->json(["status" => "success", "error" => false, "message" => "Success! You are logged out."], 200);
         }
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed! You are already logged out."], 403);
     }
 
-    public function verified(){
+    public function verified()
+    {
         // return response()->json(["status" => "success", "message" => "Chúc mừng bạn đã xác nhận email thành công!"]);
         return view('verified');
     }
 
-    // public function forgotPassword(Request $request){
-    //     $input = $request->only('email');
-    //     $validator = Validator::make($input, [
-    //         'email' => "required|email"
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return response()->json($validator->errors());
-    //     }
-    //     $response = Password::sendResetLink($input);
-    
-    //     $message = $response == Password::RESET_LINK_SENT ? 'Mail send successfully' : GLOBAL_SOMETHING_WANTS_TO_WRONG;
-        
-    //     return response()->json($message);
-    // }
 
-    // public function passwordReset(Request $request){
-    //     $input = $request->only('email','token', 'password', 'password_confirmation');
-    //     $validator = Validator::make($input, [
-    //         'token' => 'required',
-    //         'email' => 'required|email',
-    //         'password' => 'required|confirmed|min:8',
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return response()->json($validator->errors());
-    //     }
-    //     $response = Password::reset($input, function ($user, $password) {
-    //         $user->password = Hash::make($password);
-    //         $user->save();
-    //     });
-    //     $message = $response == Password::PASSWORD_RESET ? 'Password reset successfully' : GLOBAL_SOMETHING_WANTS_TO_WRONG;
-    //     return response()->json($message);
-    // }
     public function forgotPassword(Request $request)
     {
         $credentials = request()->validate(['email' => 'required|email']);
@@ -183,14 +155,17 @@ class UserController extends Controller
 
         if ($status == Password::PASSWORD_RESET) {
             return response([
-                'message'=> 'Password reset successfully'
+                'message' => 'Password reset successfully'
             ]);
         }
 
         return response([
-            'message'=> __($status)
+            'message' => __($status)
         ], 500);
-
     }
-    
+    public function get_bookmarks(){
+        $bookmarks=auth()->user()->bookmarks();
+        return response()->json($bookmarks);
+        }
+
 }

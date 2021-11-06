@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LikeQuestion;
 use Illuminate\Http\Request;
 use App\Models\Question;
 use Exception;
 use Facade\FlareClient\Http\Exceptions\NotFound;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class QuestionController extends Controller
 {
@@ -82,7 +85,7 @@ class QuestionController extends Controller
             return response()->json([
                 'status' => 'success',
                 'error' => false,
-                'data' => $post
+                'data' => $_POST
             ], 200);
         }
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed! no question found."], 404);
@@ -145,5 +148,43 @@ class QuestionController extends Controller
             return response()->json(["status" => "success", "error" => false, "message" => "Success! question deleted."], 200);
         }
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed no question found."], 404);
+    }
+    public function questionLike(Request $request)
+    {
+        $user = Auth::user();  
+        
+        $validator = Validator::make($request->all(), [
+            "question_id" => "required",
+        ]);
+        if ($validator->fails()) {
+            return $this->validationErrors($validator->errors());
+        };
+        $like = DB::table('like_questions')->where('user_id', '=', $user->id)->where('question_id', '=', $request->question_id)->get();
+        
+        if (count($like)>0) {
+            DB::table('like_questions')->where('user_id', '=', $user->id)->where('question_id', '=', $request->question_id)->delete();
+            if($like){
+            DB::table('questions')->decrement('like');
+            }
+            
+            return response()->json(["status" => "success", "type" => "dislike", "error" => false, "message" => "Successfully dislike question."], 201);
+        }
+        LikeQuestion::create([
+            'user_id'=>$user->id,
+            'question_id' => $request->question_id,
+        ]);
+        DB::table('questions')->increment('like');
+        return response()->json(["status" => "success", "type" => "like", "error" => false, "message" => "Successfully like question."], 404);
+
+    }
+    public function getLike(){
+        try {
+            $user=Auth::user();
+            $like = LikeQuestion::where('user_id','=',$user->id)->get();
+            
+            return response()->json(["status" => "success", "error" => false, "data" => $like], 200);
+        } catch (NotFoundHttpException $exception) {
+            return response()->json(["status" => "failed", "error" => $exception], 401);
+        }
     }
 }

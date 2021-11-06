@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Overtrue\LaravelFollow\Traits\CanFollow;
+use Overtrue\LaravelFollow\Traits\CanBeFollowed;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
+
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone',
         'password'
+
     ];
 
     /**
@@ -35,7 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
-    
+
     /**
      * The attributes that should be cast.
      *
@@ -45,11 +49,31 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public function posts() {
+    public function posts()
+    {
         return $this->hasMany(Post::class);
     }
 
-    public function questions() {
+    public function questions()
+    {
         return $this->hasMany(Question::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function bookmarks()
+    {
+        return $this->belongsToMany(Bookmark::class);
+    }
+    public function likeposts()
+    {
+        return $this->belongsToMany(Like::class);
+    }
+    public function likequestions()
+    {
+        return $this->belongsToMany(LikeQuestion::class);
     }
 }
