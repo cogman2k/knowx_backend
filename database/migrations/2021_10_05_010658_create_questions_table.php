@@ -16,8 +16,10 @@ class CreateQuestionsTable extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('hastag');
+            $table->string('hashtag');
             $table->text('content');
+            $table->integer('like')->default(0);
+            $table->integer('comment')->default(0);
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

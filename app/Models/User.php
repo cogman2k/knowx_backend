@@ -23,7 +23,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'full_name',
         'email',
         'phone',
-        'password'
+        'password',
+        'image',
+        'gender',
+        'bỉthday',
+        'topic',
+        'description'
     ];
 
     /**
@@ -51,5 +56,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function questions() {
         return $this->hasMany(Question::class);
+    }
+
+    public function userFollows() {
+        return $this->hasMany(UserFollow::class);
     }
 }

@@ -16,12 +16,13 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('hastag');
+            $table->string('hashtag');
+            $table->string('image')->nullable();
+            $table->integer('like')->default(0);
+            $table->integer('comment')->default(0);
             $table->text('content');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            // $table->boolean('completed')->default(false);
-            // $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

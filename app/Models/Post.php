@@ -11,9 +11,10 @@ class Post extends Model
 
     protected $fillable = [
         'title',
-        'hastag',
+        'hashtag',
         'content',
         'user_id',
+        'image',
         // 'completed',
         // 'active'
     ];

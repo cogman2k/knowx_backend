@@ -11,7 +11,7 @@ class Question extends Model
 
     protected $fillable = [
         'title',
-        'hastag',
+        'hashtag',
         'content',
         'user_id'
     ];
