@@ -16,23 +16,23 @@ class FollowSeeder extends Seeder
     public function run()
     {
         UserFollow::create([
-            'user_id' => '1',
-            'target_user_id' => '2'
-        ]);
-
-        UserFollow::create([
-            'user_id' => '1',
-            'target_user_id' => '3'
-        ]);
-
-        UserFollow::create([
-            'user_id' => '1',
+            'user_id' => '3',
             'target_user_id' => '4'
         ]);
 
         UserFollow::create([
-            'user_id' => '1',
+            'user_id' => '3',
             'target_user_id' => '5'
+        ]);
+
+        UserFollow::create([
+            'user_id' => '3',
+            'target_user_id' => '6'
+        ]);
+
+        UserFollow::create([
+            'user_id' => '3',
+            'target_user_id' => '7'
         ]);
     }
 }

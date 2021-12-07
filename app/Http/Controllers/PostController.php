@@ -49,7 +49,7 @@ class PostController extends Controller
             "title" => "required",
             "hashtag" => "required",
             "content" => "required",
-            'image' => 'required|image|mimes:jpeg,jpg,png'
+            'image' => 'required|mimes:jpeg,jpg,png'
         ]);
 
         if($validator->fails()) {
@@ -57,21 +57,21 @@ class PostController extends Controller
         }
         else{
             try {
+                $post = new Post();
                 if($request->hasFile('image')){
                     $file = $request->file('image');
                     $extension = $file->getClientOriginalExtension();
                     $filename = time().'.'.$extension;
                     $file->move('uploads/post', $filename);
-                    
-                    $post = Post::create([
-                        "title" => $request->title,
-                        "hashtag" => $request->hashtag,
-                        "content" => $request->content,
-                        "user_id" => Auth::user()->id,
-                        "image" => 'uploads/post/'.$filename,
-                    ]);
+                    $post->image = 'uploads/post/'.$filename;
                 }
-    
+
+                $post->title = $request->title;
+                $post->hashtag = $request->hashtag;
+                $post->content = $request->content;
+                $post->user_id = Auth::user()->id;
+                $post->save();
+
                 return response()->json(["status" => "success", "error" => false, "message" => "Success! post created."], 201);
             }
             catch(Exception $exception) {
@@ -131,12 +131,21 @@ class PostController extends Controller
                 return $this->validationErrors($validator->errors());
             }
 
+            if($request->hasFile('image')){
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename = time().'.'.$extension;
+                $file->move('uploads/post', $filename);
+                $post['image'] = 'uploads/post/'.$filename;
+            }
             $post['title'] = $request->title;
             $post['hashtag'] = $request->hashtag;
             $post['content'] = $request->content;
             $post->save();
-            return response()->json(["status" => "success", "error" => false, "message" => "Success! post updated."], 201);
+            return response()->json(["status" => "success", "error" => false, "message" => "Success! post updated."], 201);  
+            
         }
+
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed no post found."], 404);
     }
 
@@ -304,6 +313,24 @@ class PostController extends Controller
             
             return response()->json(["status" => "success", "error" => false, "data" => $like], 200);
         } catch (NotFoundHttpException $exception) {
+            return response()->json(["status" => "failed", "error" => $exception], 401);
+        }
+    }
+
+    public function search(Request $request){
+        try{
+            $post = Post::where('title','like','%'.$request->data.'%')
+            ->orWhere('hashtag','like','%'.$request->data.'%')
+            ->get();
+                for( $i=0 ; $i < count($post); $i++){
+                    $user = User::where('id', $post[$i]->user_id)->get();
+                    $post[$i]->{'author_id'} = $user[$i]->id;
+                    $post[$i]->{'full_name'} = $user[$i]->full_name;
+                    $post[$i]->{'user_image'} = $user[$i]->image;
+                }
+
+            return response()->json(["status" => "success", "error" => false, "data" => $post], 200);
+        }catch(NotFoundHttpException $exception) {
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }
     }

@@ -217,4 +217,21 @@ class QuestionController extends Controller
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }
     }
+
+    public function search(Request $request){
+        try {
+            $question = Question::where('title','like','%'.$request->data.'%')
+            ->orWhere('hashtag','like','%'.$request->data.'%')
+            ->get();
+            for( $i=0 ; $i < count($question); $i++){
+                $user = User::where('id', $question[$i]->user_id)->get();
+                $question[$i]->{'author_id'} = $user[$i]->id;
+                $question[$i]->{'full_name'} = $user[$i]->full_name;
+                $question[$i]->{'user_image'} = $user[$i]->image;
+            }
+            return response()->json(["status" => "success", "error" => false, "data" => $question], 200);
+        } catch (NotFoundHttpException $exception) {
+            return response()->json(["status" => "failed", "error" => $exception], 401);
+        }
+    }
 }

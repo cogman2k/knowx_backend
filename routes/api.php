@@ -12,6 +12,8 @@ use App\Http\Controllers\MentorController;
 use App\Http\Controllers\CommentPostController;
 use App\Http\Controllers\CommentQuestionController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\ChatController;
 
 Route::prefix('user')->group(function () { 
     Route::post('register', [UserController::class, 'register']);
@@ -33,7 +35,7 @@ Route::prefix('user')->group(function () {
         Route::get('logout', [UserController::class, 'logout']);
         Route::post('follow', [UserController::class, 'followUser']);
         Route::post('change-password', [UserController::class, 'changePassword']);
-        //get all users
+        Route::post('search', [UserController::class, 'search']);
         Route::get('get-all', [UserController::class, 'getAllUsers']);
         Route::post('update', [UserController::class, 'updateProfile']);
         Route::get('/following', [UserController::class, 'getListFollowingUsers']);
@@ -49,13 +51,13 @@ Route::prefix('user')->group(function () {
         Route::post('posts/checklike', [PostController::class, 'checkLike']);
         Route::post('posts/masterpost', [PostController::class, 'masterPost']);
         Route::post('posts/recomment', [PostController::class, 'getRecommentPost']);
-        
-
+        Route::post('posts/search', [PostController::class, 'search']);
         //questions resource route
         Route::resource('questions', QuestionController::class);
         Route::post('questions/getbyuserid', [QuestionController::class, 'getQuestionByUserId']);
         Route::post('questions/like', [QuestionController::class, 'questionLike']);
         Route::post('questions/checklike', [QuestionController::class, 'checkLike']);
+        Route::post('questions/search', [QuestionController::class, 'search']);
 
         //Findbuddy resource route
         Route::post('buddy/create', [FindBuddyController::class, 'createFindBuddy']);
@@ -82,6 +84,16 @@ Route::prefix('user')->group(function () {
 
         //subject resource route
         Route::get('subject/get', [SubjectController::class, 'get']);
+
+        //job resource routes
+        Route::post('job/create', [JobController::class, 'create']);
+        Route::get('job/newest', [JobController::class, 'getNewestJob']);
+        Route::post('job/show', [JobController::class, 'show']);
+
+        
+        Route::post('fetchUsers',[ChatsController::class, 'fetchUsers']);
+        Route::post('fetchmessages', [ChatsController::class, 'fetchMessages']);
+        Route::post('messages', [ChatsController::class, 'sendMessage']);
     });
 });
 
@@ -95,3 +107,5 @@ Route::post('/email/verify/resend', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth:api', 'throttle:6,1'])->name('verification.send');
+
+Route::post('messages', [ChatController::class, 'message']);

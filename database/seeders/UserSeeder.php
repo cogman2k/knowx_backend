@@ -17,6 +17,28 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        User::create([
+            'first_name' => 'Rikkei',
+            'last_name' =>  'Soft',
+            'full_name' => 'RikkeiSoft Company',
+            'type' => 'company',
+            'email' => 'rikkei@gmail.com',
+            'password' => Hash::make('123'),
+            'phone' => '0984756374',
+            'image' => 'uploads/user/rikkei.png',
+        ]);
+
+        User::create([
+            'first_name' => 'Enclave',
+            'last_name' =>  'Company',
+            'full_name' => 'Enclave Company',
+            'type' => 'company',
+            'email' => 'enclave@gmail.com',
+            'password' => Hash::make('123'),
+            'phone' => '0984756374',
+            'image' => 'uploads/user/enclave.jpg',
+        ]);
+
             User::create([
                 'first_name' => 'Trần',
                 'last_name' =>  'Huy',

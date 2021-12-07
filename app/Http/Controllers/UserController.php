@@ -285,4 +285,15 @@ class UserController extends Controller
         return response()->json(["status" => "follow", "error" => false], 200);
     }
 
+    public function search(Request $request){
+        try {
+            $user = User::where('full_name','like','%'.$request->data.'%')
+            ->orWhere('topic','like','%'.$request->data.'%')
+            ->get();
+            return response()->json(["status" => "success", "error" => false, "data" => $user], 200);
+        } catch (NotFoundHttpException $exception) {
+            return response()->json(["status" => "failed", "error" => $exception], 401);
+        }
+    }
+
 }
