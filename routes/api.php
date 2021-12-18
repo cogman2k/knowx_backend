@@ -90,10 +90,11 @@ Route::prefix('user')->group(function () {
         Route::get('job/newest', [JobController::class, 'getNewestJob']);
         Route::post('job/show', [JobController::class, 'show']);
 
-        
-        Route::post('fetchUsers',[ChatsController::class, 'fetchUsers']);
-        Route::post('fetchmessages', [ChatsController::class, 'fetchMessages']);
-        Route::post('messages', [ChatsController::class, 'sendMessage']);
+
+        //messages resources routes
+        Route::get('unseenmessage', [ChatController::class, 'getUnseenMessages']);
+        Route::post('sendlink', [ChatController::class, 'sendLinkMeeting']);
+
     });
 });
 
@@ -107,5 +108,3 @@ Route::post('/email/verify/resend', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth:api', 'throttle:6,1'])->name('verification.send');
-
-Route::post('messages', [ChatController::class, 'message']);

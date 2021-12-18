@@ -183,7 +183,7 @@ class PostController extends Controller
     public function getPostByUserId(Request $request){
         $posts = DB::table('posts')->where('user_id', $request->user_id)->get();
         if(count($posts)>0){
-            return response()->json(["status" => "success", "error" => false, "count"=> count($posts), "data" => $posts], 200);
+            return response()->json(["status" => "success", "error" => false, "count"=> count($posts), "data" => $posts, "count" => count($posts)], 200);
         }
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed! no post found."], 200);
     }
@@ -226,7 +226,7 @@ class PostController extends Controller
                 $bookmark[$i]->{'hashtag'} = $post[0]->hashtag;
             }
 
-            return response()->json(["status" => "success", "error" => false, "data" => $bookmark], 200);
+            return response()->json(["status" => "success", "error" => false, "data" => $bookmark, "count" => count($bookmark)], 200);
         } catch (NotFoundHttpException $exception) {
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }
@@ -281,7 +281,7 @@ class PostController extends Controller
     }
 
     public function masterPost(){
-        $list = DB::table('posts')->orderBy('comment', 'desc')->orderBy('like', 'desc')->get();
+        $list = DB::table('posts')->orderBy('like', 'desc')->orderBy('comment', 'desc')->get();
         if(count($list) == 0){
             return response()->json(["status" => "failed", "message"=>"Nothing result"], 200);
         }
@@ -320,7 +320,7 @@ class PostController extends Controller
     public function search(Request $request){
         try{
             $post = Post::where('title','like','%'.$request->data.'%')
-            ->orWhere('hashtag','like','%'.$request->data.'%')
+            ->orWhere('hashtag','like','%'.$request->data.'%')->orderBy('like', 'desc')
             ->get();
                 for( $i=0 ; $i < count($post); $i++){
                     $user = User::where('id', $post[$i]->user_id)->get();
@@ -329,9 +329,13 @@ class PostController extends Controller
                     $post[$i]->{'user_image'} = $user[$i]->image;
                 }
 
-            return response()->json(["status" => "success", "error" => false, "data" => $post], 200);
+            return response()->json(["status" => "success", "error" => false, "data" => $post, "count" => count($post)], 200);
         }catch(NotFoundHttpException $exception) {
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }
+    }
+
+    public function getRelatedPost(){
+        $listUser = User::where();
     }
 }   

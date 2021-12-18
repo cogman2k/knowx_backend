@@ -87,5 +87,23 @@ class MentorSeeder extends Seeder
             'subject_id' => '15',
             'description' => 'Cần tìm bạn cùng học để vượt qua kì thi này!'
         ]);
+
+        FindBuddy::create([
+            'user_id'=> '6',
+            'subject_id' => '1',
+            'description' => 'Cần tìm bạn cùng học để vượt qua kì thi này!'
+        ]);
+
+        FindBuddy::create([
+            'user_id'=> '3',
+            'subject_id' => '7',
+            'description' => 'Cần tìm bạn cùng học để vượt qua kì thi này!'
+        ]);
+
+        FindBuddy::create([
+            'user_id'=> '5',
+            'subject_id' => '6',
+            'description' => 'Cần tìm bạn cùng học để vượt qua kì thi này!'
+        ]);
     }
 }

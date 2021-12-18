@@ -162,11 +162,13 @@ class QuestionController extends Controller
     }
 
     public function getQuestionByUserId(Request $request){
-        $questions = DB::table('questions')->where('user_id', $request->user_id)->get();
-        if(count($questions)>0){
-            return response()->json(["status" => "success", "error" => false, "count"=> count($questions), "data" => $questions], 200);
+        try{
+            $questions = DB::table('questions')->where('user_id', $request->user_id)->get();
+            return response()->json(["status" => "success", "error" => false, "data" => $questions, "count"=> count($questions)], 200);
         }
-        return response()->json(["status" => "failed", "error" => true, "message" => "Failed! no question found."], 200);
+        catch(Exception $exception) {
+            return response()->json(["status" => "failed", "error" => $exception->getMessage()], 404);
+        }
     }
 
     public function questionLike(Request $request)
@@ -229,7 +231,7 @@ class QuestionController extends Controller
                 $question[$i]->{'full_name'} = $user[$i]->full_name;
                 $question[$i]->{'user_image'} = $user[$i]->image;
             }
-            return response()->json(["status" => "success", "error" => false, "data" => $question], 200);
+            return response()->json(["status" => "success", "error" => false, "data" => $question, "count" => count($question)], 200);
         } catch (NotFoundHttpException $exception) {
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }

@@ -29,6 +29,8 @@ class CreateUsersTable extends Migration
             $table->string('topic')->nullable();
             $table->text('description')->nullable();
             $table->integer('xp')->default(0);
+            $table->boolean('is_online')->default(0);
+            $table->string('last_activity')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -5,29 +5,37 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\Message;
 use App\Models\UserFollow;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Auth\Events\Registered;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Notifications\ResetPasswordRequest;
-use Illuminate\Validation\Rules\Password as RulesPassword;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+    public $email;
+
     public function register(Request $request) {
 
         $validator = Validator::make($request->all(), [
             "first_name" => "required",
             "last_name" => "required",
             "email" => "required|email|unique:users,email",
-            "password" => "required|confirmed|min:3",
+            "password" => [
+                "required", "confirmed", Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+            ],
             "phone" => "required|min:10"
         ]);
 
@@ -53,6 +61,11 @@ class UserController extends Controller
      * @param Request $request
      * @return void
      */
+    public function setSession(){
+        Session::put('name', 'huyasdas');
+        return view('livewire.messages');
+    }
+
     public function login(Request $request) {
 
         $validator = Validator::make($request->all(), [
@@ -66,6 +79,12 @@ class UserController extends Controller
 
         try {
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $email = $request->email;
+                // session()->put('id', Auth::user()->id);
+                // echo(session()->get('id'));
+                // Session::push('id', Auth::user()->id);
+                // $session = session(['id', '3']);
+                Session::put('name', 'Huyahihih');
                 $user = Auth::user();
                 $token = $user->createToken('token')->accessToken;
                 return response()->json(
@@ -75,6 +94,7 @@ class UserController extends Controller
                         "user_id" => Auth::user()->id,
                         "message" => "Success! you are logged in.",
                         "token" => $token,
+                        "email" => User::where('email', $email)->first()
                     ]
                 );
             }
@@ -104,7 +124,12 @@ class UserController extends Controller
     public function changePassword(Request $request){
         $validator = Validator::make($request->all(), [
             "old_password" => "required",
-            "new_password" => "required|min:3",
+            "new_password" => [
+                "required", Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+            ],
             "confirm_password" => "required|same:new_password"
         ]);
         if($validator->fails()){
@@ -179,7 +204,6 @@ class UserController extends Controller
     * @return void
     */
     public function logout() {
-
         if(Auth::check()) {
             Auth::user()->token()->revoke();
             return response()->json(["status" => "success", "error" => false, "message" => "Success! You are logged out."], 200);
@@ -260,7 +284,7 @@ class UserController extends Controller
         if(count($list)==0){
             return response()->json(["status"=>"failed","Nothing following users!"]);
         }
-        return response()->json(["status" => "success", "error" => false, "data" => $listFollow]);
+        return response()->json(["status" => "success", "error" => false, "data" => $listFollow, "count" => count($listFollow)]);
     }
 
     //get list followers
@@ -273,7 +297,7 @@ class UserController extends Controller
         if(count($list)==0){
             return response()->json(["status"=>"failed","Nothing followers!"]);
         }
-        return response()->json(["status" => "success", "error" => false, "data" => $listFollowers]);
+        return response()->json(["status" => "success", "error" => false, "data" => $listFollowers, "count" => count($listFollowers)]);
     }
 
     public function checkFollow(Request $request){
@@ -290,10 +314,9 @@ class UserController extends Controller
             $user = User::where('full_name','like','%'.$request->data.'%')
             ->orWhere('topic','like','%'.$request->data.'%')
             ->get();
-            return response()->json(["status" => "success", "error" => false, "data" => $user], 200);
+            return response()->json(["status" => "success", "error" => false, "data" => $user, "count" => count($user)], 200);
         } catch (NotFoundHttpException $exception) {
             return response()->json(["status" => "failed", "error" => $exception], 401);
         }
     }
-
 }
