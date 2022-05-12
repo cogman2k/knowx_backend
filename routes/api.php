@@ -14,6 +14,9 @@ use App\Http\Controllers\CommentQuestionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\ClassController;
+use App\Http\Controllers\RoadmapController;
 
 Route::prefix('user')->group(function () { 
     Route::post('register', [UserController::class, 'register']);
@@ -38,9 +41,15 @@ Route::prefix('user')->group(function () {
         Route::post('search', [UserController::class, 'search']);
         Route::get('get-all', [UserController::class, 'getAllUsers']);
         Route::post('update', [UserController::class, 'updateProfile']);
-        Route::get('/following', [UserController::class, 'getListFollowingUsers']);
-        Route::get('/followers', [UserController::class, 'getListFollowers']);
-        Route::post('/checkfollow', [UserController::class, 'checkFollow']);
+        Route::get('following', [UserController::class, 'getListFollowingUsers']);
+        Route::get('followers', [UserController::class, 'getListFollowers']);
+        Route::post('checkfollow', [UserController::class, 'checkFollow']);
+        Route::get('education/{id}', [UserController::class, 'getEducation']);
+        Route::post('education', [UserController::class, 'addEducation']);
+        Route::delete('education/{id}', [UserController::class, 'removeEducation']);
+        Route::get('experience/{id}', [UserController::class, 'getExperience']);
+        Route::post('experience', [UserController::class, 'addExperience']);
+        Route::delete('experience/{id}', [UserController::class, 'removeExperience']);
         // Posts resource route
         Route::resource('posts', PostController::class);
         Route::post('posts/getbyuserid', [PostController::class, 'getPostByUserId']);
@@ -52,12 +61,18 @@ Route::prefix('user')->group(function () {
         Route::post('posts/masterpost', [PostController::class, 'masterPost']);
         Route::post('posts/recomment', [PostController::class, 'getRecommentPost']);
         Route::post('posts/search', [PostController::class, 'search']);
+        Route::post('posts/report', [PostController::class, 'report']);
+        Route::delete('posts/report/{id}', [PostController::class, 'deleteReport']);
+        Route::get('posts/reports/get', [PostController::class, 'getReports']);
+        Route::get('posts/report/count', [PostController::class, 'countReports']);
         //questions resource route
         Route::resource('questions', QuestionController::class);
         Route::post('questions/getbyuserid', [QuestionController::class, 'getQuestionByUserId']);
+        Route::post('questions/getbysubject', [QuestionController::class, 'getQuestionBySubject']);
         Route::post('questions/like', [QuestionController::class, 'questionLike']);
         Route::post('questions/checklike', [QuestionController::class, 'checkLike']);
         Route::post('questions/search', [QuestionController::class, 'search']);
+        Route::post('questions/getbyclass', [QuestionController::class, 'getQuestionByClass']);
 
         //Findbuddy resource route
         Route::post('buddy/create', [FindBuddyController::class, 'createFindBuddy']);
@@ -77,10 +92,10 @@ Route::prefix('user')->group(function () {
         //Create comment route
         Route::post('posts/comment/create', [CommentPostController::class, 'createComment']);
         Route::post('posts/comment/get', [CommentPostController::class, 'getListComment']);
-        Route::post('posts/comment/delete', [CommentPostController::class, 'deleteComment']);
+        Route::post('posts/comment/delete', [CommentPostController::class, 'removeComment']);
         Route::post('questions/comment/create', [CommentQuestionController::class, 'createComment']);
         Route::post('questions/comment/get', [CommentQuestionController::class, 'getListComment']);
-        Route::post('questions/comment/delete', [CommentPostController::class, 'deleteComment']);
+        Route::post('questions/comment/delete', [CommentQuestionController::class, 'removeComment']);
 
         //subject resource route
         Route::get('subject/get', [SubjectController::class, 'get']);
@@ -95,6 +110,34 @@ Route::prefix('user')->group(function () {
         Route::get('unseenmessage', [ChatController::class, 'getUnseenMessages']);
         Route::post('sendlink', [ChatController::class, 'sendLinkMeeting']);
 
+        //Upload file resources routes
+        Route::post('file/upload', [FileController::class, 'create']);
+        Route::post('file/get', [FileController::class, 'getFile']);
+        Route::post('file/getbyclass', [FileController::class, 'getFileByClass']);
+        Route::post('file/remove', [FileController::class, 'removeFile']);
+
+        //Class resources routes
+        Route::post('class/addmember', [ClassController::class, 'addMember']);
+        Route::post('class/removemember', [ClassController::class, 'removeMember']);
+        Route::get('class/getclass', [ClassController::class, 'getClass']);
+        Route::post('class/getmembers', [ClassController::class, 'getMembers']);
+        Route::post('class/ismentor', [ClassController::class, 'isMentor']);
+        Route::post('class/get', [ClassController::class, 'getClassInfo']);
+
+        //Upload file resources routes
+        Route::post('roadmap/addroadmap', [RoadmapController::class, 'addRoadmap']);
+        Route::post('roadmap/getroadmap', [RoadmapController::class, 'getRoadmap']);
+    });
+});
+
+//admin routes
+Route::prefix('admin')->group(function () { 
+    Route::middleware(['auth:api'])->group(function () {
+        Route::get('count', [UserController::class, 'count']);
+        Route::get('users', [UserController::class, 'getUsers']);
+        Route::get('companies', [UserController::class, 'getCompanies']);
+        Route::post('add-user', [UserController::class, 'addUser']);
+        Route::delete('delete-user/{id}', [UserController::class, 'deleteUser']);
     });
 });
 

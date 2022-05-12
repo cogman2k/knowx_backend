@@ -18,6 +18,8 @@ class CreateQuestionsTable extends Migration
             $table->string('title');
             $table->string('hashtag');
             $table->text('content');
+            $table->string('subject_id')->default("none");
+            $table->string('class_id')->default("none");
             $table->integer('like')->default(0);
             $table->integer('comment')->default(0);
             $table->unsignedBigInteger('user_id');

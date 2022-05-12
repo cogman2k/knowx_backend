@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             MentorSeeder::class,
             FollowSeeder::class,
             JobSeeder::class,
+            ClassSeeder::class,
         ]);
     }
 }

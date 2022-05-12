@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Question;
+use App\Models\ReportPost;
 use App\Models\Bookmark;
 use App\Models\LikePost;
 use Exception;
@@ -23,7 +25,8 @@ class PostController extends Controller
     //get my posts
     public function index()
     {
-        $posts = Auth::user()->posts;
+        // $posts = Auth::user()->posts;
+        $posts = Post::where("user_id", Auth::user()->id)->orderBy('created_at','desc')->get();
         return response()->json(["status" => "success", "error" => false, "count" => count($posts), "data" => $posts], 200);
     }
 
@@ -157,7 +160,7 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post = Auth::user()->posts->find($id);
+        $post = Post::find($id);
         if($post) {
             $post->delete();
             return response()->json(["status" => "success", "error" => false, "message" => "Success! post deleted."], 200);
@@ -338,4 +341,47 @@ class PostController extends Controller
     public function getRelatedPost(){
         $listUser = User::where();
     }
+
+    public function report(Request $request ){
+        $validator = Validator::make($request->all(), [
+            "post_id" => "required",
+            "description" => "required",
+        ]);
+
+        if($validator->fails()) {
+            return $this->validationErrors($validator->errors());
+        }
+        else{
+            try {
+                $report = ReportPost::create([
+                    "post_id" => $request->post_id,
+                    "description" => $request->description
+                ]);
+                return response()->json(["status" => "success", "error" => false, "message" => "Success! report sended."], 201);
+            }
+            catch(Exception $exception) {
+                return response()->json(["status" => "failed", "error" => $exception->getMessage()], 404);
+            }
+
+        }
+    }
+
+    public function countReports(){
+        $count = count(ReportPost::all());
+        return response()->json(["status" => "success", "count" => $count], 201);
+    }
+
+    public function getReports(){
+        $reports = ReportPost::all();
+        return response()->json(["status" => "success", "reports" => $reports, "count" => count($reports)], 200);
+    }
+
+    public function deleteReport($id){
+        $report = ReportPost::find($id);
+        if($report) {
+            $report->delete();
+            return response()->json(["status" => "success", "message"=> "report deleted!"], 200);
+        }
+        return response()->json(["status" => "failed", "message" => "no report found!"], 200);
+    }   
 }   

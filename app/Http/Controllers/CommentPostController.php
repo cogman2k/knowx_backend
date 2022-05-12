@@ -36,15 +36,6 @@ class CommentPostController extends Controller
         return response()->json(["status" => "success", "error" => false, "message" => "Success! Comment created!."], 201);
     }
 
-    public function deleteComment(Request $request){
-        $item = CommentPost::where('id', $request->comment_id)->get();
-        if(count($item)) {
-            CommentPost::where('id', $request->comment_id)->delete();
-            return response()->json(["status" => "success", "error" => false, "message" => "Success! deleted."], 200);
-        }
-        return response()->json(["status" => "failed", "error" => true, "message" => "Failed delete comment"], 404);
-    }
-
     public function getListComment(Request $request){
         $listComment = CommentPost::where('post_id', $request->post_id)->orderBy('created_at','desc')->get();
         if(count($listComment) == 0){
@@ -56,5 +47,13 @@ class CommentPostController extends Controller
             $listComment[$i]->{'image'} = $user[0]->image;
         }
         return response()->json(["status" => "success", "error" => false,"count" => count($listComment) ,"message" =>"Success!.", "data" => $listComment], 201);
+    }
+
+    public function removeComment(Request $request){
+        if($request->id){
+            $removedComment = CommentPost::where('id', $request->id)->delete();
+            return response()->json(["status" => "success", "message" => "Deleted this comment"]);
+        }
+        return response()->json(["status" => "failed", "comment not found!"], 200);
     }
 }

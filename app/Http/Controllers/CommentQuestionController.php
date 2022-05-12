@@ -57,4 +57,12 @@ class CommentQuestionController extends Controller
         }
         return response()->json(["status" => "success", "error" => false,"count" => count($listComment) ,"message" =>"Success!.", "data" => $listComment], 201);
     }
+
+    public function removeComment(Request $request){
+        if($request->id){
+            $removedComment = CommentQuestion::where('id', $request->id)->delete();
+            return response()->json(["status" => "success", "message" => "Deleted this comment"]);
+        }
+        return response()->json(["status" => "failed", "comment not found!"], 200);
+    }
 }

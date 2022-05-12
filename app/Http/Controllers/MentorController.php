@@ -50,6 +50,7 @@ class MentorController extends Controller
         for( $i=0 ; $i < count($list); $i++){
             $subject = Subject::where('id', $list[$i]->subject_id)->get();
             $list[$i]->{'subject_name'} = $subject[0]->name;
+            $list[$i]->{'subject_id'} = $subject[0]->id;
 
         }
         return response()->json(["status" => "success", "error" => false, "message" => "Success! Get list subject metoring success!.", "data"=>$list], 200);
